@@ -9,10 +9,11 @@ using System.Web.Http.Cors;
 
 namespace CarApi.Controllers
 {
+    [EnableCors(origins: "http://localhost:57356", headers: "*", methods: "*")]
     public class CarController : ApiController
     {
         //This class is used to Get the Cars[] array or a Cars[id] element of the array
-        [EnableCors(origins: "http://localhost:53493", headers: "*", methods: "*")]
+       
 
         // GET: api/Car
         public Car[] Get()
