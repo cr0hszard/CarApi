@@ -25,7 +25,7 @@ namespace CarApi.Models
 {
     public class Car
     {
-        private static Car[] Cars = PopulateArray(500); //static Array of cars
+        private static Car[] Cars = PopulateArray(15); //static Array of cars
 
         //The Counter is used to count the instances of objects and to set a different Id for every car in the constructor
         public static int Counter = 0;
@@ -68,7 +68,15 @@ namespace CarApi.Models
             Car.Counter++;
             this.Id = Car.Counter;
         }
+        public Car(String brand, int productionYear,int id)
+        {
+            this.Brand = brand;
 
+            this.ProductionYear = productionYear;
+
+           
+            this.Id = id;
+        }
 
         //This method is used to return a randomly generated array of cars ------------------------------------------
         public static Car[] PopulateArray(int length)//length is the legth of the array to create

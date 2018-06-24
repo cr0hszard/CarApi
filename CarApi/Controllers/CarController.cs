@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using CarApi.Models;
 using System.Web.Http.Cors;
+using System.Web;
 
 namespace CarApi.Controllers
 {
@@ -13,7 +14,7 @@ namespace CarApi.Controllers
     public class CarController : ApiController
     {
         //This class is used to Get the Cars[] array or a Cars[id] element of the array
-       
+
 
         // GET: api/Car
         public Car[] Get()
@@ -29,14 +30,25 @@ namespace CarApi.Controllers
             return auto; //returns Car.Cars[id] element of the array
         }
 
-        // POST: api/Car
-        public void Post([FromBody]string value)
-        {
-        }
-
         // PUT: api/Car/5
-        public void Put(int id, [FromBody]string value)
-        {
+        [HttpPost]
+        public void Post([FromBody]Car car)
+        {   //We create a dummy array called temp(temporary) of length Car.Cars.Length+1(the space we need to add the new car)
+            Car[] temp = new Car[Car.GetCars().Length + 1];
+
+            //Copy the Car.Cars array into the temp (the last place in the array will be undefined)
+            for (int i = 0; i < temp.Length - 1; i++)
+            {
+                temp[i] = Car.GetCars()[i];
+            }
+
+            //Assign the new Car we received  to the last place in the array
+            temp[temp.Length - 1] = new Car(car.Brand, car.ProductionYear,temp.Length);
+           
+            //set the temp array as our new updated Car.Cars array
+            Car.SetCars(temp);
+
+            //return Ok();
         }
 
         // DELETE: api/Car/5
@@ -44,11 +56,7 @@ namespace CarApi.Controllers
         {
 
         }
-        //Method used to regenerate the Cars array(not used yet)
-        public void Regenerate()
-        {
-            Car.SetCars(Car.PopulateArray(Car.GetCars().Length));
-        }
+
     }
 }
 
