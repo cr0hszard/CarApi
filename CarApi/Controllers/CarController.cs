@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Web.Http;
 using CarApi.Models;
 using System.Web.Http.Cors;
-using System.Web;
 
 namespace CarApi.Controllers
 {
@@ -17,9 +12,11 @@ namespace CarApi.Controllers
 
 
         // GET: api/Car
-        public Car[] Get()
+        public List<Car> Get()
         {
-            return Car.GetCars();//returns Car.Cars Array
+            Car.updateTxtFile();
+            return Car.GetCars(); ;
+            //returns Car.Cars Array
         }
 
         // GET: api/Car/5
@@ -33,22 +30,11 @@ namespace CarApi.Controllers
         // PUT: api/Car/5
         [HttpPost]
         public void Post([FromBody]Car car)
-        {   //We create a dummy array called temp(temporary) of length Car.Cars.Length+1(the space we need to add the new car)
-            Car[] temp = new Car[Car.GetCars().Length + 1];
+        {   //Assign the new Car we received  to the last place in the array
+            Car.UpCount();
+            Car.Cars.Add(new Car(car.Brand, car.ProductionYear, Car.Cars.Count+1));
+            Car.updateTxtFile();
 
-            //Copy the Car.Cars array into the temp (the last place in the array will be undefined)
-            for (int i = 0; i < temp.Length - 1; i++)
-            {
-                temp[i] = Car.GetCars()[i];
-            }
-
-            //Assign the new Car we received  to the last place in the array
-            temp[temp.Length - 1] = new Car(car.Brand, car.ProductionYear,temp.Length);
-           
-            //set the temp array as our new updated Car.Cars array
-            Car.SetCars(temp);
-
-            //return Ok();
         }
 
         // DELETE: api/Car/5

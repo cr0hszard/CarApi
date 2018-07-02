@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.IO;
+
+
 
 /*Car Class:
     *   Properties:
@@ -25,28 +27,34 @@ namespace CarApi.Models
 {
     public class Car
     {
-        private static Car[] Cars = PopulateArray(15); //static Array of cars
+        private static int Counter = 0;
+        public static List<Car> Cars = PopulateList(15); //static Array of cars
+        public static string json;
 
         //The Counter is used to count the instances of objects and to set a different Id for every car in the constructor
-        public static int Counter = 0;
 
-        //Car properties---------------------------------
+        //Car properties----------------------------------------------------------------------------------------
         public string Brand { get; set; }
         public int ProductionYear { get; set; }
         public int Id { get; set; }
 
-        //Cars array getter and setter --------------------
-        public static Car[] GetCars()
+        //Cars array getter and setter ---------------------------------------------------------------------------
+        public static List<Car> GetCars()
         {
-            return Cars;
+            return Car.Cars;
         }
 
-        public static void SetCars(Car[] Array)
+        public static void SetCars(List<Car> List)
         {
-            Car.Cars = Array;
+            Car.Cars = List;
         }
+        //Counter getter and setter ----------------------------------------------------------------------------------
 
-        //Class constructors------------------------------
+        public static void UpCount()
+        {
+            Car.Counter++;
+        }
+        //Class constructors------------------------------------------------------------------------------------------
         public Car()
         {
             this.Brand = null;
@@ -55,8 +63,6 @@ namespace CarApi.Models
 
             Car.Counter++;
             this.Id = Car.Counter;
-
-
         }
 
         public Car(String brand, int productionYear)
@@ -68,18 +74,18 @@ namespace CarApi.Models
             Car.Counter++;
             this.Id = Car.Counter;
         }
-        public Car(String brand, int productionYear,int id)
+
+        public Car(String brand, int productionYear, int id)
         {
             this.Brand = brand;
 
             this.ProductionYear = productionYear;
 
-           
             this.Id = id;
         }
 
-        //This method is used to return a randomly generated array of cars ------------------------------------------
-        public static Car[] PopulateArray(int length)//length is the legth of the array to create
+        //This method is used to return a randomly generated array of cars -----------------------------------------------------------
+        public static List<Car> PopulateList(int length)//length is the legth of the array to create
         {
             String[] NameArray = { "Alfa", "Peugeot", "Skoda", "BMW", "Audi", "Lamborghini", "Opel", "Seat", "Citroen", "Lada" };//Array of names
 
@@ -89,15 +95,43 @@ namespace CarApi.Models
             Random r1 = new Random();
 
             //we will create a dummy array the same size of the Cars[] array and populate the array with it 
-            Car[] Array = new Car[length];
+            List<Car> List = new List<Car>(length);
             for (int i = 0; i < length; i++)
             {
-                Array[i] = new Car(
+                List.Add(new Car(
                     NameArray[(int)(r1.NextDouble() * 10)],
                     lowestProductionYear + (int)(r1.NextDouble() * 24)
-                    );
+                    ));
+
             }
-            return Array;
+            return List;
+        }
+        //Method we use to save the List to a .txt file in the CarApi/Model folder
+        public static void updateTxtFile()
+        {
+            string _path = @"C:\Users\aless\OneDrive\Documents\GitHub\CarApi\CarApi\Models\carList.txt";
+            //this clears the text file 
+            Car.json = "";
+            
+            for (int i = 0; i < Car.Cars.Count; i++)
+            {   //if its the first Car in the list open square brackets, go to new line  wtrite the first Car
+                if (i == 0)
+                {
+                    Car.json += "[" + Environment.NewLine + JsonConvert.SerializeObject(Car.Cars[i]) + "," + Environment.NewLine;
+                }
+                //if its the first Car in the list close square brackets
+                if (i == Car.Cars.Count-1)
+                {
+                    Car.json += JsonConvert.SerializeObject(Car.Cars[i]) + Environment.NewLine + "]";
+                }
+                //else just write the next Car add a coma(,) and go to new line 
+                else
+                {
+                    Car.json += JsonConvert.SerializeObject(Car.Cars[i]) + "," + Environment.NewLine;
+                }
+            }
+            //write Car.json to a . txt File in _path 
+            File.WriteAllText(_path, Car.json);
         }
     }
 }
