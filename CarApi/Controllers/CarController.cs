@@ -14,9 +14,9 @@ namespace CarApi.Controllers
         // GET: api/Car
         public List<Car> Get()
         {
-            Car.updateTxtFile();
-            return Car.GetCars(); ;
-            //returns Car.Cars Array
+            Car.UpdateTxtFile();           
+            return Car.GetCars(); //returns Car.Cars Array
+
         }
 
         // GET: api/Car/5
@@ -27,20 +27,19 @@ namespace CarApi.Controllers
             return auto; //returns Car.Cars[id] element of the array
         }
 
-        // PUT: api/Car/5
+        // Post: api/Car/5
         [HttpPost]
         public void Post([FromBody]Car car)
-        {   //Assign the new Car we received  to the last place in the array
-            Car.UpCount();
-            Car.Cars.Add(new Car(car.Brand, car.ProductionYear, Car.Cars.Count+1));
-            Car.updateTxtFile();
-
+        {   //Assign the new Car we received  to the last place in the array,
+          
+            Car.CarDB.Add(car);//Add a car to the database
+            Car.SetCars(Car.CarDB.Load());//update the CarList with the updated list from the database
+            Car.UpdateTxtFile();
         }
 
         // DELETE: api/Car/5
         public void Delete(int id)
         {
-
         }
 
     }
