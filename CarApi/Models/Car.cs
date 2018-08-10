@@ -28,7 +28,7 @@ namespace CarApi.Models
     {
         private static int Counter = 0;     //The Counter is used to count the instances of objects and to set a different Id for every car in the constructor
         public static Database CarDB = new Database();
-        public static List<Car> CarsList = PopulateList(100); //static Array of cars
+        public static List<Car> CarsList = PopulateList(30); //static Array of cars
 
 
 

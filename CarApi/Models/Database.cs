@@ -37,11 +37,48 @@ namespace CarApi.Models
             using (CarDBConnection = new SQLiteConnection("Data Source=" + this.path))
             {
                 CarDBConnection.Open();
-              
-                    //create the query String and the command to create the CarDB.sqlite3 database where we will store the Car object properties
-                    String CreateTableQuery = "CREATE table IF NOT EXISTS  `Cars` (`Id`	INTEGER PRIMARY KEY AUTOINCREMENT,`Brand`	TEXT,`ProductionYear` INTEGER);";
 
-                    SQLiteCommand Create = new SQLiteCommand(CreateTableQuery, CarDBConnection);
+                //create the query String and the command to create the CarDB.sqlite3 database where we will store the Car object properties
+                String CreateTableQuery = //Creating Manufacturer table
+                                          "CREATE TABLE IF NOT EXISTS  `manufacturer` ("
+                                                    + "`manufacturerId`	INTEGER PRIMARY KEY AUTOINCREMENT,"
+                                                    + "`name`	TEXT);"
+                                          //Creating Car table
+                                          + "CREATE TABLE IF NOT EXISTS  `car` ("
+                                                    + "`id`	INTEGER PRIMARY KEY AUTOINCREMENT,"
+                                                    + "`brand`	TEXT,"
+                                                    + "`productionYear` INTEGER,"
+                                                    + "`carManufacturer`	INTEGER,"
+                                                    + " FOREIGN KEY(carManufacturer) REFERENCES manufacturer(manufacturerId));"
+                                          //Creating car_option table
+                                          + "CREATE TABLE IF NOT EXISTS  `car_option` ("
+                                                    + "`optionId`	INTEGER PRIMARY KEY AUTOINCREMENT,"
+                                                    + "`optionName` TEXT);"
+                                          //Creating car_options table
+                                          + "CREATE TABLE IF NOT EXISTS  `car_options` ("
+                                                    + "`carId`	INTEGER ,"
+                                                    + "`carOptionId` INTEGER,"
+                                                    + " FOREIGN KEY(carId) REFERENCES car(Id),"
+                                                    + " FOREIGN KEY(carOptionId) REFERENCES car_option(optionId));"
+                                          //Creating country table
+                                          + "CREATE TABLE IF NOT EXISTS  `country` ("
+                                                    + "`countryIsoId`	INTEGER PRIMARY KEY,"
+                                                    + "`name`	TEXT);"
+                                          //Creating car_options table
+                                          + "CREATE TABLE IF NOT EXISTS  `user` ("
+                                                    + "`id`  INTEGER PRIMARY KEY AUTOINCREMENT,"
+                                                    + "`name`	TEXT,"
+                                                    + "`dateOfBirth` INTEGER,"
+                                                    +"`countryIsoId` INTEGER,"
+                                                    + "FOREIGN KEY(countryIsoId) REFERENCES country(countryIsoId));"
+                                          //Creating car_options table
+                                          + "CREATE TABLE IF NOT EXISTS  `car_user` ("
+                                                    + "`carId`	INTEGER,"//should put Primary key if i want the cars to not be owned by multiple people
+                                                    + "`carUserId` INTEGER,"
+                                                    + "FOREIGN KEY(carUserId) REFERENCES user(id),"
+                                                    + "FOREIGN KEY(carId) REFERENCES car(id));";
+                
+                SQLiteCommand Create = new SQLiteCommand(CreateTableQuery, CarDBConnection);
                     try
                     {
                         Create.ExecuteNonQuery();
@@ -63,10 +100,10 @@ namespace CarApi.Models
             {
                 CarDBConnection.Open();
 
-                    string insertCarQuery = "INSERT INTO Cars (Brand,ProductionYear) VALUES (@Brand,@ProductionYear)";
+                    string insertCarQuery = "INSERT INTO car (brand,productionYear) VALUES (@Brand,@ProductionYear)";
                     SQLiteCommand InsertCarCommand = new SQLiteCommand(insertCarQuery, CarDBConnection);
-                    InsertCarCommand.Parameters.AddWithValue("Brand", car.Brand);
-                    InsertCarCommand.Parameters.AddWithValue("ProductionYear", car.ProductionYear);
+                    InsertCarCommand.Parameters.AddWithValue("brand", car.Brand);
+                    InsertCarCommand.Parameters.AddWithValue("productionYear", car.ProductionYear);
                     try
                     {
                         InsertCarCommand.ExecuteNonQuery();
@@ -88,11 +125,11 @@ namespace CarApi.Models
             {
                 CarDBConnection.Open();
 
-                    SQLiteCommand DatabaseSize = new SQLiteCommand("SELECT COUNT(*) from Cars", CarDBConnection);
+                    SQLiteCommand DatabaseSizeQuery = new SQLiteCommand("SELECT COUNT(*) from car", CarDBConnection);
 
                     try
                     {
-                        result = int.Parse(DatabaseSize.ExecuteScalar().ToString());
+                        result = int.Parse(DatabaseSizeQuery.ExecuteScalar().ToString());
                     }
                     catch (Exception ex)
                     {
@@ -120,9 +157,9 @@ namespace CarApi.Models
             {
                 CarDBConnection.Open();
 
-                    string stm = "SELECT * FROM Cars ";
+                    string LoadQuery = "SELECT * FROM car ";
 
-                    using (SQLiteCommand cmd = new SQLiteCommand(stm, CarDBConnection))
+                    using (SQLiteCommand cmd = new SQLiteCommand(LoadQuery, CarDBConnection))
                     {
                         using (SQLiteDataReader rdr = cmd.ExecuteReader())
                         {
